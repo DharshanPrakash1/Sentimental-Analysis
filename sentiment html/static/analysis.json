@@ -1,0 +1,36 @@
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector('form');
+    const textArea = document.querySelector('textarea');
+    const resultDiv = document.querySelector('#result');
+
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const userInput = textArea.value;
+
+        resultDiv.innerHTML = '';
+
+        if (userInput) {
+            const formData = new FormData();
+            formData.append('text', userInput);
+
+            const response = await fetch('/analyze', {
+                method: 'POST',
+                body: formData,
+            });
+            console.log(response.status)
+            if (response.status === 200) {
+                const data = await response.json();
+                resultDiv.innerHTML = `
+                    <h2>Analysis Result</h2>
+                    <p><strong>Text:</strong> ${data.text}</p>
+                    <p><strong>Sentiment:</strong> ${data.sentiment}</p>
+                `;
+            } else {
+                resultDiv.innerHTML = '<p>An error occurred while analyzing the text. Please try again later.</p>';
+            }
+        } else {
+            resultDiv.innerHTML = '<p>Please enter some text for analysis.</p>';
+        }
+    });
+});
